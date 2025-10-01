@@ -3,7 +3,7 @@ import { pool } from "../config/db.js";
 export const getAllUsersHandler = async (req, res) => {
   try {
     const [users] = await pool.query(
-      "SELECT id, fullname, username, email, role FROM users"
+      "SELECT id, fullname, username, email, role, phone_number, age, address FROM users"
     );
 
     res.status(200).json({
@@ -21,7 +21,7 @@ export const getUserByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const [users] = await pool.query(
-      "SELECT id, fullname, username, email, role FROM users WHERE id = ? ",
+      "SELECT id, fullname, username, email, role, phone_number, age, address FROM users WHERE id = ? ",
       [id]
     );
 
@@ -113,5 +113,48 @@ export const addUserHandler = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const updateUserHandler = async (req, res) => {
+  const { id } = req.params;
+  const {
+    fullname,
+    username,
+    email,
+    password,
+    role,
+    address,
+    phone_number,
+    age,
+  } = req.body;
+  try {
+    await pool.query(
+      "UPDATE users SET fullname=?, username=?, email=?, password=?, role=?, address=?, phone_number=?, age=? WHERE id=?",
+      [
+        fullname,
+        username,
+        email,
+        password,
+        role,
+        address,
+        phone_number,
+        age,
+        id,
+      ]
+    );
+
+    const [userUpdate] = await pool.query(
+      "SELECT id, fullname, username, email, role, phone_number, age, address FROM users WHERE id = ? ",
+      [id]
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "User updated succesfully",
+      data: userUpdate,
+    });
+  } catch (error) {
+    console.error(error);
   }
 };

@@ -158,3 +158,26 @@ export const updateUserHandler = async (req, res) => {
     console.error(error);
   }
 };
+
+export const deleteUserHandler = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [deleteUser] = await pool.query("DELETE FROM users WHERE id = ?", [
+      id,
+    ]);
+
+    if (deleteUser.affectedRows === 0) {
+      res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "User deleted succesfully",
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};

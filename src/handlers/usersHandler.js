@@ -44,12 +44,6 @@ export const getUserByIdHandler = async (req, res) => {
 };
 
 export const addUserHandler = async (req, res) => {
-  const { fullname, username, email, password, role } = req.body;
-
-  const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [
-    email,
-  ]);
-
   if (!fullname || !fullname.trim()) {
     return res.status(400).json({
       status: "fail",

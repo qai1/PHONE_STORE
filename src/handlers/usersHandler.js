@@ -44,45 +44,17 @@ export const getUserByIdHandler = async (req, res) => {
 };
 
 export const addUserHandler = async (req, res) => {
-  if (!fullname || !fullname.trim()) {
-    return res.status(400).json({
-      status: "fail",
-      message: "fullname is required",
-    });
-  }
+  const { fullname, username, email, password, role } = req.body;
 
-  if (!username || !username.trim()) {
+  if (!fullname || !username || !email || !password || !role) {
     return res.status(400).json({
-      status: "fail",
-      message: "username is required",
+      status: "failed",
+      message: "Please provide all required fields",
     });
-  }
-
-  if (!email || !email.trim()) {
+  } else if (role !== "admin" && role !== "user") {
     return res.status(400).json({
-      status: "fail",
-      message: "email is required",
-    });
-  }
-
-  if (!password || !password.trim()) {
-    return res.status(400).json({
-      status: "fail",
-      message: "password is required",
-    });
-  }
-
-  if (!role || !role.trim()) {
-    return res.status(400).json({
-      status: "fail",
-      message: "role is required",
-    });
-  }
-
-  if (rows.length > 0) {
-    return res.status(404).json({
-      status: "fail",
-      message: "User already exists",
+      status: "failed",
+      message: "Role must be either 'admin' or 'user'",
     });
   }
 
@@ -98,15 +70,22 @@ export const addUserHandler = async (req, res) => {
       username,
       email,
       role,
+      address: null,
+      phone_number: null,
+      age: null,
     };
 
     res.status(201).json({
       status: "success",
-      message: "User created succesfully",
-      data: newUser.insertId,
+      message: "User added successfully",
+      data: newUser,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+    });
   }
 };
 

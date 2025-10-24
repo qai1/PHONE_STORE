@@ -59,13 +59,13 @@ export const addUserHandler = async (req, res) => {
   }
 
   try {
-    const [result] = await pool.query(
+    const [users] = await pool.query(
       "INSERT INTO users (fullname, username, email, password, role) VALUES (?, ?, ?, ?, ?)",
       [fullname, username, email, password, role]
     );
 
     const newUser = {
-      id: result.insertId,
+      id: users.insertId,
       fullname,
       username,
       email,

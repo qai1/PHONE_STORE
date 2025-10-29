@@ -2,6 +2,7 @@ import { pool } from "../config/db.js";
 import { ResponseError } from "../error/responseError.js";
 import validate from "../validations/validate.js";
 import { createUserSchema } from "../validations/userValidation.js";
+import { updateUserSchema } from "../validations/userValidation.js";
 
 export const getAllUser = async () => {
   const [users] = await pool.query(
@@ -47,13 +48,26 @@ export const createUser = async (req) => {
 };
 
 export const updateUser = async (id, req) => {
-  const { fullname, username, email, role, address, phone_number, age } = req;
+  const validation = validate(updateUserSchema, req);
+
+  console.log(JSON.stringify(validation));
+
+  const {
+    fullname,
+    username,
+    email,
+    role,
+    address,
+    password,
+    phone_number,
+    age,
+  } = validation;
 
   await getUserById(id);
 
   const [result] = await pool.query(
-    "UPDATE users SET fullname=?, username=?, email=?, role=?, address=?, phone_number=?, age=? WHERE id=?",
-    [fullname, username, email, role, address, phone_number, age, id]
+    "UPDATE users SET fullname=?, username=?, email=?, role=?, address=?, password=?, phone_number=?, age=? WHERE id=?",
+    [fullname, username, email, role, address, password, phone_number, age, id]
   );
 
   if (result.affectedRows === 0) {
@@ -67,6 +81,7 @@ export const updateUser = async (id, req) => {
     email,
     role,
     address,
+    password,
     phone_number,
     age,
   };

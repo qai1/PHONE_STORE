@@ -1,5 +1,8 @@
 import { pool } from "../config/db.js";
 import { ResponseError } from "../error/responseError.js";
+import validate from "../validations/validate.js";
+import { createProductSchema } from "../validations/productValidation.js";
+import { updateProductSchema } from "../validations/productValidation.js";
 
 export const getAllProducts = async () => {
   const [products] = await pool.query(
@@ -22,7 +25,11 @@ export const getProductById = async (id) => {
 };
 
 export const createProduct = async (req) => {
-  const { user_id, name, description, price, stock } = req;
+  const validation = validate(createProductSchema, req);
+
+  console.log(JSON.stringify(validation));
+
+  const { user_id, name, description, price, stock } = validation;
 
   const [result] = await pool.query(
     "INSERT INTO products (user_id, name, description, price, stock) VALUES (?, ?, ?, ?, ?)",
@@ -42,7 +49,11 @@ export const createProduct = async (req) => {
 };
 
 export const updateProduct = async (id, req) => {
-  const { user_id, name, description, price, stock } = req;
+  const validation = validate(updateProductSchema, req);
+
+  console.log(JSON.stringify(validation));
+
+  const { user_id, name, description, price, stock } = validation;
 
   await getProductById(id);
 

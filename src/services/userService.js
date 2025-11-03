@@ -28,12 +28,19 @@ export const createUser = async (req) => {
   const validation = validate(createUserSchema, req);
 
   console.log(JSON.stringify(validation));
-
-  const { fullname, username, email, password, role } = validation;
-
+  const {
+    fullname,
+    username,
+    email,
+    role,
+    address,
+    password,
+    phone_number,
+    age,
+  } = validation;
   const [users] = await pool.query(
-    "INSERT INTO users (fullname, username, email, password, role) VALUES (?, ?, ?, ?, ?)",
-    [fullname, username, email, password, role]
+    "INSERT INTO users (fullname, username, email, password, role, address, phone_number, age) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    [fullname, username, email, password, role, address, phone_number, age]
   );
 
   const newUser = {
@@ -42,6 +49,10 @@ export const createUser = async (req) => {
     username,
     email,
     role,
+    address,
+    password,
+    phone_number,
+    age,
   };
 
   return newUser;
@@ -95,8 +106,5 @@ export const deleteUser = async (id) => {
   if (result.affectedRows === 0) {
     throw new ResponseError(404, "Failed to delete user");
   }
-
-  return {
-    message: "User deleted successfully",
-  };
+  return { message: "User deleted successfully" };
 };

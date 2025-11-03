@@ -27,7 +27,6 @@ export const getUserById = async (id) => {
 export const createUser = async (req) => {
   const validation = validate(createUserSchema, req);
 
-  console.log(JSON.stringify(validation));
   const {
     fullname,
     username,

@@ -3,6 +3,7 @@ import { ResponseError } from "../error/responseError.js";
 import validate from "../validations/validate.js";
 import { createUserSchema } from "../validations/userValidation.js";
 import { updateUserSchema } from "../validations/userValidation.js";
+import bcrypt from "bcrypt";
 
 export const getAllUser = async () => {
   const [users] = await pool.query(
@@ -25,21 +26,33 @@ export const getUserById = async (id) => {
 };
 
 export const createUser = async (req) => {
-  const validation = validate(createUserSchema, req);
+  const validated = validate(createUserSchema, req);
 
   const {
     fullname,
     username,
     email,
     role,
-    address,
     password,
+    address,
     phone_number,
     age,
-  } = validation;
+  } = validated;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const [users] = await pool.query(
     "INSERT INTO users (fullname, username, email, password, role, address, phone_number, age) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [fullname, username, email, password, role, address, phone_number, age]
+    [
+      fullname,
+      username,
+      email,
+      hashedPassword,
+      role,
+      address,
+      phone_number,
+      age,
+    ]
   );
 
   const newUser = {
@@ -49,7 +62,6 @@ export const createUser = async (req) => {
     email,
     role,
     address,
-    password,
     phone_number,
     age,
   };
@@ -58,10 +70,7 @@ export const createUser = async (req) => {
 };
 
 export const updateUser = async (id, req) => {
-  const validation = validate(updateUserSchema, req);
-
-  console.log(JSON.stringify(validation));
-
+  const validated = validate(updateUserSchema, req);
   const {
     fullname,
     username,
@@ -71,30 +80,35 @@ export const updateUser = async (id, req) => {
     password,
     phone_number,
     age,
-  } = validation;
+  } = validated;
 
-  await getUserById(id);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const [result] = await pool.query(
     "UPDATE users SET fullname=?, username=?, email=?, role=?, address=?, password=?, phone_number=?, age=? WHERE id=?",
-    [fullname, username, email, role, address, password, phone_number, age, id]
+    [
+      fullname,
+      username,
+      email,
+      role,
+      address,
+      hashedPassword,
+      phone_number,
+      age,
+      id,
+    ]
   );
 
   if (result.affectedRows === 0) {
     throw new ResponseError(404, "Failed to update user");
   }
 
-  return {
-    id,
-    fullname,
-    username,
-    email,
-    role,
-    address,
-    password,
-    phone_number,
-    age,
-  };
+  const [userUpdate] = await pool.query(
+    "SELECT fullname, username, email, role, address, phone_number, age FROM users WHERE id=?",
+    [id]
+  );
+
+  return userUpdate[0];
 };
 
 export const deleteUser = async (id) => {

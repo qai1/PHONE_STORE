@@ -3,6 +3,7 @@ import * as userService from "../services/userService.js";
 export const getAllUserHandler = async (req, res, next) => {
   try {
     const response = await userService.getAllUser();
+
     res.status(200).json({
       status: "success",
       data: response,
@@ -13,8 +14,8 @@ export const getAllUserHandler = async (req, res, next) => {
 };
 
 export const getUserByIdHandler = async (req, res, next) => {
-  const { id } = req.params;
   try {
+    const { id } = req.params;
     const response = await userService.getUserById(id);
     if (!response) {
       return res.status(404).json({

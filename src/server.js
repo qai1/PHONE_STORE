@@ -13,7 +13,7 @@ app.use(express.json());
 
 const PORT = 3000;
 
-app.use(authRouter);
+app.use(authRouter); // auth baru
 app.use(userRouter);
 app.use(productRouter);
 

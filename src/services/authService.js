@@ -1,7 +1,6 @@
 import { pool } from "../config/db.js";
 import { ResponseError } from "../error/responseError.js";
-import { registerSchema } from "../validations/authValidation.js";
-import { loginSchema } from "../validations/authValidation.js";
+import { registerSchema, loginSchema } from "../validations/authValidation.js";
 import validate from "../validations/validate.js";
 import bcrypt from "bcrypt";
 
@@ -61,7 +60,7 @@ export const login = async (req) => {
 
   if (rows.length === 0) {
     // Email tidak ditemukan -> jangen beri tahu mana yang salah (email/password)
-    throw new ResponseError("Email atau password salah");
+    throw new ResponseError(401, "Email atau password salah");
   }
 
   const user = rows[0];
@@ -70,7 +69,7 @@ export const login = async (req) => {
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    throw new ResponseError("Email atau password salah");
+    throw new ResponseError(401, "Email atau password salah");
   }
 
   // Kembalikan data user tanpa password
@@ -79,7 +78,6 @@ export const login = async (req) => {
     fullname: user.fullname,
     username: user.username,
     email: user.email,
-    password: user.hashedPassword,
     role: user.role,
     address: user.address,
     phone_number: user.phone_number,

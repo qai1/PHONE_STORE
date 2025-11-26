@@ -1,8 +1,10 @@
 export const errorMiddleware = (err, req, res, next) => {
-  const status = err.status || 500;
-  const bodyStatus = status >= 500 ? "error" : "fail";
+  console.error(err);
 
-  res.status(status).json({
+  const statusCode = err.status || 500;
+  const bodyStatus = statusCode >= 500 ? "error" : "fail";
+
+  res.status(statusCode).json({
     status: bodyStatus,
     message: err.message || "Internal Server Error",
   });
